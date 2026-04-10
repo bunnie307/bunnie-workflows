@@ -2,41 +2,37 @@
 
 이 파일은 플러그인 설치 시 자동 적용된다.
 
-## 테스트 전략 자동 발전
+## 자동 발전 규칙
 
-### 버그 수정 시 (reactive)
+이 플러그인의 진화 스킬(test-evolve, design-spec, project-init)은 실전에서 패턴을 발견하면 `~/.bunnie-workflows/strategy/`에 기록한다. 같은 머신의 모든 프로젝트가 이 디렉토리를 공유하므로 한 프로젝트의 학습이 다른 프로젝트에 자동 전파된다.
 
-1. **관점 분석**: 기존 테스트가 이 버그를 왜 잡지 못했는지, 어떤 테스트 관점이 누락되었는지 분석
-2. **프로젝트 전략 업데이트**: 누락된 관점이 프로젝트 CLAUDE.md의 테스트 관점 목록에 없으면 추가. 있지만 커버리지가 부족하면 항목 보강. 추가 배경 한 줄 기록.
-3. **동일 패턴 보강**: 버그와 같은 패턴을 공유하는 모듈에 해당 관점 테스트 보강. 프로젝트 전반 보강은 별도 요청 시에만.
-4. **전략 기록**: 새 관점이 발견되면 `~/.bunnie-workflows/strategy/testing/perspectives.md`에 기록.
+### 버그 수정 시
 
-### 기능 구현 완료 시 (proactive)
+기존 테스트가 이 버그를 왜 잡지 못했는지 분석하고, 누락된 테스트 관점이 있으면:
+1. 프로젝트 CLAUDE.md의 테스트 관점 목록에 추가
+2. 동일 패턴의 다른 모듈에 테스트 보강
+3. `~/.bunnie-workflows/strategy/testing/perspectives.md`에 기록
 
-기능이 완료되면 프로젝트 CLAUDE.md의 테스트 관점 목록을 참조하여 누락된 테스트가 없는지 확인:
-- 새 API 엔드포인트 → contract + boundary 테스트 확인
-- 새 이벤트/메시지 consumer → idempotency 테스트 확인
-- 새 에러 핸들링 → error path 테스트 확인
-- 데이터 직렬화 경계 → boundary 테스트 확인
+### 기능 구현 완료 시
 
-### 프로젝트 초기화
+프로젝트 CLAUDE.md의 테스트 관점 목록을 참조하여 누락된 테스트가 없는지 확인:
+- 새 API 엔드포인트 → contract + boundary 테스트
+- 새 이벤트/메시지 consumer → idempotency 테스트
+- 새 에러 핸들링 → error path 테스트
+- 데이터 직렬화 경계 → boundary 테스트
 
-프로젝트에 CLAUDE.md 테스트 관점 목록이 아직 없으면, 기본 관점(strategy/testing/perspectives.md)과 발견된 관점(~/.bunnie-workflows/strategy/testing/perspectives.md)을 참조하여 초기화를 제안.
+### 설계→구현 갭 발견 시
 
-## 설계 관점 자동 발전
+설계서에 없어서 구현 중 판단이 필요했던 부분이 있으면 `~/.bunnie-workflows/strategy/design/perspectives.md`에 기록.
 
-설계 문서 기반으로 구현을 진행한 후, 설계→구현 갭이 발견되면:
-1. 갭 유형을 분석 (타입 누락, 에러 흐름 미정의 등)
-2. `~/.bunnie-workflows/strategy/design/perspectives.md`에 기록
-3. 다음 설계 문서 생성 시 축적된 관점이 자동 반영
+### 프로젝트 초기화 후
 
-## 프로젝트 초기화 패턴 발전
+번들에 없던 의존성 추가, 설정 변경, 버전 호환성 문제가 발생하면 `~/.bunnie-workflows/strategy/init/`에 기록.
 
-프로젝트 초기화 후 발견되는 패턴:
-1. 추가로 필요했던 의존성, 변경이 필요했던 설정값, 버전 호환성 문제를 기록
-2. `~/.bunnie-workflows/strategy/init/`에 기록
-3. 다음 프로젝트 초기화 시 반영
+## 프로젝트 초기화
+
+프로젝트에 CLAUDE.md 테스트 관점 목록이 아직 없으면, 기본 관점과 발견된 관점을 참조하여 초기화를 제안.
 
 ## 전략 동기화
 
-발견된 관점/패턴은 `~/.bunnie-workflows/strategy/`에 기록된다. 같은 머신의 모든 프로젝트가 이 디렉토리를 공유하므로 자동 전파. 플러그인 레포에 반영하려면 `/bunnie-workflows:sync`로 PR을 생성한다.
+플러그인 레포에 반영하려면 `/bunnie-workflows:sync`로 PR을 생성한다.
