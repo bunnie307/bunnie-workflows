@@ -51,25 +51,26 @@ description: 버그 수정 후 테스트 전략을 자동 발전시키는 진화
 ### Step 5: RECORD — 전략 기록
 
 프로젝트의 CLAUDE.md를 확인하고 업데이트:
-- 테스트 관점 목록이 없으면 strategy/testing/perspectives.md 기반으로 초기화
+- 테스트 관점 목록이 없으면 기본 관점(strategy/testing/perspectives.md) + 발견된 관점(~/.bunnie-workflows/strategy/testing/perspectives.md) 기반으로 초기화
 - 누락된 관점이면 해당 관점을 프로젝트 CLAUDE.md에 추가 (구체적 항목 + 추가 배경)
 - 기존 관점이지만 부족하면 항목 보강
 
-strategy/testing/perspectives.md에 새 관점 추가:
-- core/strategy-schema.md의 형식을 따른다
-- 유래 정보를 반드시 포함한다
-
-### Step 6: PROPAGATE — 플러그인 동기화
-
-새 관점이 발견된 경우 core/sync-rules.md의 절차를 따른다:
+사용자 공간에 새 관점 기록:
 
 ```bash
-PLUGIN_DIR="${CLAUDE_WORKFLOWS_DIR:-$HOME/workspace/github/bunnie307/bunnie-workflows}"
-cd "$PLUGIN_DIR"
-git add strategy/testing/perspectives.md
-git commit -m "evolve: testing add [관점명] from [프로젝트명]"
-git push origin main 2>/dev/null || echo "Push failed - manual push needed"
+mkdir -p ~/.bunnie-workflows/strategy/testing
 ```
+
+`~/.bunnie-workflows/strategy/testing/perspectives.md`에 새 관점 추가:
+- core/strategy-schema.md의 형식을 따른다
+- 유래 정보를 반드시 포함한다
+- 파일이 없으면 생성한다
+
+### Step 6: PROPAGATE — 전파
+
+`~/.bunnie-workflows/strategy/`는 같은 머신의 모든 프로젝트가 공유한다. 별도의 동기화 작업 없이, 한 프로젝트에서 기록한 관점은 다른 프로젝트에서 즉시 사용 가능.
+
+- 동일 패턴의 다른 모듈 보강 (프로젝트 전반은 사용자 요청 시)
 
 ### 보고
 
@@ -77,4 +78,4 @@ git push origin main 2>/dev/null || echo "Push failed - manual push needed"
 - 분석된 관점
 - 업데이트된 항목
 - 추가된 테스트 수
-- 플러그인 동기화 여부
+- 기록 위치 (~/.bunnie-workflows/strategy/testing/perspectives.md)

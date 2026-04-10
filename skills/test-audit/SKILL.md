@@ -28,7 +28,11 @@ echo "Source: $SRC, Tests: $TEST, Ratio: $(echo "scale=1; $TEST * 100 / $SRC" | 
 
 ### Step 2: 관점별 분석
 
-strategy/testing/perspectives.md의 관점 목록을 읽는다. 프로젝트 CLAUDE.md에 테스트 관점 목록이 있으면 그것을 우선 사용한다.
+관점 목록을 두 소스에서 읽어 합친다:
+1. 기본 관점: strategy/testing/perspectives.md (플러그인 내장)
+2. 발견된 관점: ~/.bunnie-workflows/strategy/testing/perspectives.md (실전에서 축적, 있는 경우)
+
+프로젝트 CLAUDE.md에 테스트 관점 목록이 있으면 그것을 우선 사용한다.
 
 각 관점에 대해:
 - 해당 관점의 테스트가 존재하는가?

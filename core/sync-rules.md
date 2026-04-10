@@ -1,42 +1,60 @@
-# 플러그인 동기화 규칙
+# 전략 동기화 규칙
 
-프로젝트에서 발견된 전략을 플러그인 레포로 동기화하는 규칙.
+발견된 전략의 저장과 전파 규칙.
 
-## 동기화 대상
+## 저장 경로
 
-- strategy/ 디렉토리의 전략 파일 변경
-- 새 관점/패턴 발견 시
+발견된 전략은 사용자 공간에 저장한다:
 
-## 동기화 절차
-
-### 1. 플러그인 레포 경로 확인
-
-```bash
-PLUGIN_DIR="${CLAUDE_WORKFLOWS_DIR:-$HOME/workspace/github/bunnie307/bunnie-workflows}"
+```
+~/.bunnie-workflows/strategy/
+  testing/
+    perspectives.md       # 실전에서 발견된 테스트 관점
+  ...
 ```
 
-### 2. 변경 사항 반영
+디렉토리가 없으면 생성한다:
 
 ```bash
-cd "$PLUGIN_DIR"
-git add strategy/
-git commit -m "evolve: [도메인] add [관점/패턴명] from [프로젝트명]"
-git push origin main 2>/dev/null || echo "Push failed - manual push needed"
+mkdir -p ~/.bunnie-workflows/strategy/testing
 ```
 
-### 3. 커밋 메시지 규칙
+## 읽기 규칙
 
-- 새 관점/패턴 추가: `evolve: [도메인] add [이름] from [프로젝트명]`
-- 기존 항목 보강: `evolve: [도메인] enhance [이름] from [프로젝트명]`
-- 구조 변경: `refactor: [설명]`
+전략을 참조할 때는 두 소스를 합친다:
 
-## 동기화하지 않는 것
+1. **기본 전략**: 플러그인의 `strategy/[domain]/*.md` (불변, 플러그인 업데이트로만 변경)
+2. **발견된 전략**: `~/.bunnie-workflows/strategy/[domain]/*.md` (실전에서 축적)
+
+## 쓰기 규칙
+
+새 관점/패턴이 발견되면:
+
+1. `~/.bunnie-workflows/strategy/[domain]/` 에 추가 (core/strategy-schema.md 형식)
+2. 프로젝트 CLAUDE.md의 관련 섹션도 업데이트
+
+플러그인의 `strategy/` 디렉토리는 직접 수정하지 않는다.
+
+## 프로젝트 간 전파
+
+`~/.bunnie-workflows/strategy/`는 같은 머신의 모든 프로젝트가 공유한다. 한 프로젝트에서 발견한 관점은 다른 프로젝트에서 즉시 사용 가능.
+
+## 기록하지 않는 것
 
 - 프로젝트 특화 설정 (프로젝트 CLAUDE.md에만 기록)
 - 임시 디버깅 메모
-- 검증되지 않은 가설 (실전에서 확인된 것만 동기화)
+- 검증되지 않은 가설 (실전에서 확인된 것만 기록)
 
-## 충돌 해결
+## 플러그인 개발자용: base 승격
 
-- 플러그인 레포가 정본
-- 프로젝트에서 동일 관점을 다르게 수정한 경우, 플러그인 레포의 버전을 우선하되 프로젝트 특화 내용은 프로젝트 CLAUDE.md에 보존
+플러그인 개발자는 주기적으로 `~/.bunnie-workflows/strategy/`에 축적된 검증된 관점을 플러그인의 base 전략(`strategy/`)에 승격시킬 수 있다:
+
+```bash
+# 발견된 관점 확인
+cat ~/.bunnie-workflows/strategy/testing/perspectives.md
+
+# 검증된 관점을 플러그인 base에 반영
+# (플러그인 레포에서 직접 편집 후 커밋/푸시)
+```
+
+승격된 관점은 다음 플러그인 업데이트 시 모든 사용자에게 배포된다.
