@@ -1,6 +1,15 @@
-# NestJS + Prisma + Kafka 스택 번들
+# NestJS MSA + Prisma + Kafka 스택 번들
 
-검증된 기술 스택 조합. 이 번들의 의존성과 설정은 실제 프로젝트에서 함께 동작함을 확인한 것이다.
+MSA(마이크로서비스) 아키텍처 기반. 서비스별 독립 배포, Kafka를 통한 이벤트 기반 통신.
+
+> 검증: 2026-04-10 chain-indexer, crypto-vai 프로젝트에서 사용
+
+## 아키텍처 특성
+
+- 서비스별 독립 앱 (apps/[service]/)
+- 공유 라이브러리 (libs/)
+- Kafka를 통한 서비스 간 비동기 통신
+- 서비스별 독립 Prisma 스키마 가능
 
 ## 의존성
 
@@ -24,27 +33,32 @@
 
 ```
 apps/
-  [service-name]/
+  [service-a]/
     src/
       dto/
       usecases/
       controllers/
-      [service-name].module.ts
+      [service-a].module.ts
       main.ts
+  [service-b]/
+    src/
+      ...
 libs/
-  common/src/
-  types/src/
+  common/src/          # 공유 유틸, 에러 처리, 인터셉터
+  types/src/           # 공유 타입, Kafka 토픽 정의
 prisma/
-  schema.prisma
+  schema.prisma        # 공유 스키마 (또는 서비스별 분리)
+docker-compose.yml     # Kafka, PostgreSQL, Redis 등
 ```
 
 ## 아키텍처 규칙
 
 - Controller → UseCase(execute()) → Service
 - DTO 위치: apps/[service]/src/dto/
-- 에러: AppException + ErrorCode enum
+- 에러: AppException + ErrorCode enum (libs/common)
 - DB: Prisma, UUID PK, cursor pagination (encodeCursor/decodeCursor)
 - Kafka 토픽 정의: libs/types/src/kafka.ts
+- 서비스 간 통신: Kafka 이벤트만 (직접 HTTP 호출 금지)
 
 ## 설정 파일
 
@@ -52,6 +66,7 @@ prisma/
 - strict: true
 - esModuleInterop: true
 - target: ES2022
+- paths: libs/* 매핑
 
 ### prisma/schema.prisma
 - provider: postgresql
@@ -61,4 +76,3 @@ prisma/
 ## 프로젝트 발견 패턴
 
 <!-- 이 번들로 프로젝트를 시작한 후 발견된 패턴들 -->
-<!-- 예: > 유래: YYYY-MM-DD [프로젝트명]에서 [발견 내용] -->
