@@ -36,15 +36,20 @@ Claude Code 플러그인 — 자기 발전형 개발 워크플로우 자동화.
 
 ```
 bunnie-workflows/
-  core/                    # Evolution Core (공통 지침 문서)
-    evolution-engine.md    # 진화 스킬의 6단계 프로세스
-    strategy-schema.md     # strategy 파일 형식 규격
-    sync-rules.md          # 프로젝트 간 동기화 규칙
-  strategy/                # 도메인별 축적된 전략
-    testing/               # 테스트 도메인
-      perspectives.md      # 테스트 관점 목록
-  skills/                  # 스킬 (진화 + 정적)
-  templates/               # 프로젝트/스킬/전략 템플릿
+  core/                          # Evolution Core (공통 지침 문서)
+    evolution-engine.md          # 진화 스킬의 6단계 프로세스
+    strategy-schema.md           # strategy 파일 형식 규격
+    sync-rules.md                # 전략 동기화 규칙
+  strategy/                      # 도메인별 기본 전략
+    testing/perspectives.md      # 테스트 관점
+    design/perspectives.md       # 설계 관점
+    design/schema.md             # 설계 문서 스키마
+    init/nestjs-monolith-prisma.md   # 모놀리틱 스택 번들
+    init/nestjs-msa-prisma-kafka.md  # MSA 스택 번들
+  skills/                        # 스킬 (진화 + 정적)
+  templates/                     # 프로젝트/스킬/전략 템플릿
+  scripts/                       # 개발 도구
+    validate-structure.sh        # 구조 검증 스크립트
 ```
 
 ## 스킬
@@ -64,10 +69,13 @@ bunnie-workflows/
 
 ## 동작 원리
 
-1. 버그 수정 시 `test-evolve` 스킬이 누락된 테스트 관점을 분석
-2. 프로젝트 CLAUDE.md에 해당 관점을 추가하고 테스트 보강
-3. 새 관점이 발견되면 `strategy/testing/perspectives.md`에 유래(provenance)와 함께 축적
-4. 플러그인 업데이트로 다른 프로젝트/PC에서도 축적된 관점 활용
+진화 스킬은 실전에서 패턴을 발견하고 축적한다:
+
+1. 버그 수정, 설계→구현 갭, 초기화 문제 등을 스킬이 분석
+2. 프로젝트 CLAUDE.md에 발견된 관점을 추가
+3. `~/.bunnie-workflows/strategy/`에 유래(provenance)와 함께 기록
+4. 같은 머신의 모든 프로젝트가 이 디렉토리를 공유하므로 자동 전파
+5. `/bunnie-workflows:sync`로 플러그인 레포에 PR을 보내면 다른 사용자에게도 배포
 
 ## 테스트 관점 (기본 7개)
 
