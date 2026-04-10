@@ -18,9 +18,15 @@ description: 에이전트가 일관되게 구현할 수 있는 수준의 설계 
 ### Step 1: DETECT — 컨텍스트 감지
 
 - 프로젝트 CLAUDE.md에서 아키텍처 규칙 읽기
-- 기존 코드에서 유사 기능 패턴 분석 (디렉토리 구조, 네이밍, 기존 UseCase 구조)
+- 기존 코드에서 유사 기능 패턴 분석:
+  - 참조할 수 있는 기존 UseCase, Controller, 테스트 파일 경로
+  - import 경로와 DI 등록 패턴
+  - 네이밍 규칙 (메서드명, 에러코드 형식 등)
+  - 재사용해야 하는 공유 코드 (예외 클래스, DTO, 가드, 인터셉터)
 - 기존 설계 문서 확인 (docs/design/)
 - 기능 유형 판별: API 기능 / 이벤트 consumer / 배치 작업 / 기타
+
+**중요:** DETECT에서 분석한 내용은 context.md에 기록한다. 이 정보가 문서에 없으면 구현 에이전트가 패턴을 추측해야 한다.
 
 ### Step 2: ANALYZE — 설계 관점 검토
 
@@ -28,10 +34,7 @@ description: 에이전트가 일관되게 구현할 수 있는 수준의 설계 
 1. 기본 관점: strategy/design/perspectives.md (플러그인 내장)
 2. 발견된 관점: ~/.bunnie-workflows/strategy/design/perspectives.md (실전에서 축적)
 
-각 관점에 대해 이번 기능에 해당하는지 확인:
-- 에러 구체성: 에러 흐름이 필요한 기능인가?
-- 타입 완전성: 정의해야 할 인터페이스가 있는가?
-- 경계 조건: 극단값을 고려해야 하는 입력이 있는가?
+각 관점에 대해 이번 기능에 해당하는지 확인.
 
 ### Step 3: EXTRACT — 요구사항 구체화
 
@@ -46,33 +49,19 @@ description: 에이전트가 일관되게 구현할 수 있는 수준의 설계 
 ### Step 4: APPLY — 문서 생성
 
 `docs/design/[feature-name]/` 디렉토리에 문서를 생성한다.
-strategy/design/schema.md의 스키마를 따른다.
+strategy/design/schema.md의 스키마와 검증 규칙을 따른다.
 
 **필수:**
-- README.md (요약, 선행조건, 미결사항)
+- README.md (요약, 선행조건, 미결사항, 에이전트 참조 가이드)
+- context.md (참조 구현, 재사용 코드, 와이어링, 네이밍 규칙)
 
 **기능 유형에 따라 포함:**
-- interfaces.md (API/이벤트가 있을 때)
+- interfaces.md (API/이벤트가 있을 때, NEW/EXTEND 구분 포함)
 - data-model.md (DB 변경이 있을 때)
-- flows.md (비즈니스 로직이 있을 때)
-- files.md (항상 권장)
-- tests.md (항상 권장, strategy/testing/perspectives.md 참조)
+- implementation.md (phase별 구현 계획 + 흐름 + 파일 목록 + 인라인 타입 시그니처)
+- tests.md (phase별 테스트 계획, 구현보다 먼저 작성)
 
-빈 파일은 만들지 않는다.
-
-**검증:** strategy/design/schema.md의 검증 규칙을 따른다. 검증 실패 시 자동 보강. 판단이 필요한 부분만 사용자에게 질문.
-
-**에이전트 참조 가이드** (README.md 하단에 포함):
-
-```markdown
-## 구현 시 참조 가이드
-| 구현 단계 | 참조 문서 |
-|-----------|-----------|
-| 데이터 모델 | data-model.md |
-| UseCase | interfaces.md + flows.md |
-| Controller | interfaces.md + files.md |
-| 테스트 | tests.md + interfaces.md |
-```
+빈 파일은 만들지 않는다. 검증 실패 시 자동 보강.
 
 ### 보고
 
