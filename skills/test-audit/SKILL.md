@@ -51,4 +51,3 @@ strategy/testing/perspectives.md의 관점 목록을 읽는다. 프로젝트 CLA
 2. ...
 
 사용자에게 보강 진행 여부를 확인한 후 실행.
-```
