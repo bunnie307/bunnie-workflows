@@ -73,26 +73,54 @@ npm view [패키지명] version
 - CLAUDE.md 생성 (아키텍처 규칙 + 테스트 관점)
 - 의존성 설치
 
-### Step 5: RECORD — 번들 스냅샷 업데이트 + 패턴 기록
+### Step 5: RECORD — 자동 트리거 기반 번들 갱신
 
 ```bash
 mkdir -p ~/.bunnie-workflows/strategy/init
 ```
 
-**5a. 버전 스냅샷 업데이트:**
+RECORD는 3가지 자동 트리거로 동작한다:
 
-Step 3에서 최신 버전을 선택했고 프로젝트가 정상 동작하면, 사용자 공간의 번들 스냅샷을 업데이트한다. `~/.bunnie-workflows/strategy/init/[번들명].md`의 의존성 버전을 실제 사용된 버전으로 갱신:
+**트리거 1: npm install 성공 후 버전 캡처**
+
+의존성 설치가 성공하면 `package-lock.json`에서 실제 해석된 버전을 읽고, 번들 스냅샷과 비교한다. 차이가 있으면 사용자 공간의 번들 스냅샷을 자동 갱신:
+
+```bash
+# package-lock.json에서 실제 설치된 버전 추출
+node -e "const lock = require('./package-lock.json'); Object.entries(lock.packages).filter(([k]) => k.startsWith('node_modules/')).forEach(([k,v]) => console.log(k.replace('node_modules/',''), v.version))"
+```
+
+`~/.bunnie-workflows/strategy/init/[번들명].md`의 의존성 버전을 실제 사용된 버전으로 갱신:
 
 ```markdown
 ## 의존성 (업데이트: YYYY-MM-DD)
 ### Prisma
 - prisma: ^6.8.0    ← 6.6.0에서 업데이트, [프로젝트명]에서 검증
-- @prisma/client: ^6.8.0
 ```
 
-다음 프로젝트 초기화 시 이 업데이트된 버전이 번들 기본값으로 사용된다.
+**트리거 2: 추가 의존성 설치 감지**
 
-**5b. 호환성 문제 기록:**
+프로젝트 초기화 직후 세션에서 `npm install [패키지]`가 실행되면, 번들에 없던 의존성인지 확인한다. 없던 것이면 사용자에게 질문:
+
+```
+"[패키지명]이 번들에 없는 의존성입니다. 번들에 추가할까요?"
+A) 이 번들의 기본 의존성으로 추가
+B) 이 프로젝트에서만 사용 (번들 갱신 안 함)
+```
+
+A를 선택하면 `~/.bunnie-workflows/strategy/init/[번들명].md`에 추가.
+
+**트리거 3: 설정 파일 변경 감지**
+
+번들에서 생성한 설정 파일(tsconfig.json, prisma/schema.prisma 등)이 변경되면, 번들 기본값과 diff를 비교한다. 의미 있는 변경이면 사용자에게 질문:
+
+```
+"tsconfig.json이 번들 기본값과 다릅니다. 번들 기본값을 업데이트할까요?"
+A) 번들 기본값 업데이트
+B) 이 프로젝트에서만 사용
+```
+
+**호환성 문제 기록:**
 
 최신 버전으로 올렸더니 문제가 발생한 경우, 경고 정보를 기록:
 
@@ -103,11 +131,6 @@ Step 3에서 최신 버전을 선택했고 프로젝트가 정상 동작하면, 
 ```
 
 다음 프로젝트 초기화 시 Step 3에서 이 경고가 표시된다.
-
-**5c. 기타 패턴 기록:**
-
-- 번들에 없었지만 추가로 필요했던 의존성
-- 변경이 필요했던 설정값
 
 ### Step 6: PROPAGATE — 전파
 

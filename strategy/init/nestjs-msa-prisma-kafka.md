@@ -29,6 +29,18 @@ MSA(마이크로서비스) 아키텍처 기반. 서비스별 독립 배포, Kafk
 - @nestjs/microservices: ^11.0.0
 - kafkajs: ^2.2.4
 
+### Dev
+- typescript: ^5.7.0
+- ts-node: ^10.9.0
+- @types/node: ^22.0.0
+- jest: ^29.7.0
+- ts-jest: ^29.2.0
+- @types/jest: ^29.5.0
+- eslint: ^9.0.0
+- @typescript-eslint/eslint-plugin: ^8.0.0
+- @typescript-eslint/parser: ^8.0.0
+- prettier: ^3.4.0
+
 ## 디렉토리 구조
 
 ```

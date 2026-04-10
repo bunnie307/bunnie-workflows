@@ -146,6 +146,36 @@ for f in $(find strategy -name "perspectives.md" -o -name "patterns.md" 2>/dev/n
   fi
 done
 
+# ─── 5b. Init 번들 스키마 검증 ───
+
+echo ""
+echo "== Init 번들 스키마 =="
+
+for f in $(find strategy/init -name "*.md" 2>/dev/null); do
+  fname=$(echo "$f" | sed 's|strategy/init/||')
+
+  if grep -q "^## 의존성" "$f"; then
+    pass "$fname: '의존성' 섹션"
+  else
+    fail "$fname: '의존성' 섹션 없음"
+    hint "번들에 ## 의존성 섹션을 추가하세요."
+  fi
+
+  if grep -q "^## 디렉토리 구조" "$f"; then
+    pass "$fname: '디렉토리 구조' 섹션"
+  else
+    fail "$fname: '디렉토리 구조' 섹션 없음"
+    hint "번들에 ## 디렉토리 구조 섹션을 추가하세요."
+  fi
+
+  if grep -q "^## 아키텍처 규칙" "$f"; then
+    pass "$fname: '아키텍처 규칙' 섹션"
+  else
+    fail "$fname: '아키텍처 규칙' 섹션 없음"
+    hint "번들에 ## 아키텍처 규칙 섹션을 추가하세요."
+  fi
+done
+
 # ─── 6. 진화 스킬 ↔ strategy 연결 ───
 
 echo ""
