@@ -126,7 +126,8 @@ for f in $(find strategy -name "*.md" -not -path "./.git/*" 2>/dev/null); do
     || warn "$fname: '프로젝트 발견' 섹션 없음"
 
   # 유래 형식 존재 확인 (프로젝트 발견 항목이 있는 경우)
-  provenance_count=$(grep -c "^> 유래:" "$f" 2>/dev/null || echo "0")
+  provenance_count=$(grep -c "^> 유래:" "$f" 2>/dev/null || true)
+  provenance_count=${provenance_count:-0}
   if [ "$provenance_count" -gt 0 ]; then
     pass "$fname: 유래(provenance) ${provenance_count}건"
   fi

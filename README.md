@@ -33,6 +33,8 @@ bunnie-workflows/
 |------|------|------|------|
 | **test-evolve** | 진화 | `/bunnie-workflows:test-evolve` | 버그 → 관점 분석 → 전략 진화 |
 | **test-audit** | 정적 | `/bunnie-workflows:test-audit` | 관점별 테스트 커버리지 감사 |
+| **project-init** | 진화 | `/bunnie-workflows:project-init` | 검증된 스택 번들로 프로젝트 초기화 |
+| **design-spec** | 진화 | `/bunnie-workflows:design-spec` | 에이전트 실행 가능한 설계 문서 생성 |
 | **sync** | 정적 | `/bunnie-workflows:sync` | 발견된 전략을 플러그인 레포에 PR 동기화 |
 
 ## 스킬 유형
