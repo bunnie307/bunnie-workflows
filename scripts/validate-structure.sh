@@ -17,7 +17,7 @@ warn() { CHECKS=$((CHECKS+1)); WARNINGS=$((WARNINGS+1)); echo "  ! $1"; }
 
 echo "== 필수 파일 =="
 for f in \
-  CLAUDE.md README.md settings.json setup.sh \
+  CLAUDE.md README.md settings.json \
   .claude-plugin/plugin.json \
   .claude-plugin/marketplace.json \
   core/evolution-engine.md \
