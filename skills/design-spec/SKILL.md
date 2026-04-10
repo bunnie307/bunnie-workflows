@@ -60,12 +60,7 @@ strategy/design/schema.md의 스키마를 따른다.
 
 빈 파일은 만들지 않는다.
 
-**검증 (3가지만):**
-1. flows.md의 모든 타입명이 interfaces.md에 정의되어 있는가
-2. flows.md의 에러코드가 interfaces.md의 에러 응답에 정의되어 있는가
-3. files.md의 모든 경로가 다른 문서에서 최소 1회 참조되는가
-
-검증 실패 시 자동 보강. 판단이 필요한 부분만 사용자에게 질문.
+**검증:** strategy/design/schema.md의 검증 규칙을 따른다. 검증 실패 시 자동 보강. 판단이 필요한 부분만 사용자에게 질문.
 
 **에이전트 참조 가이드** (README.md 하단에 포함):
 
@@ -79,31 +74,13 @@ strategy/design/schema.md의 스키마를 따른다.
 | 테스트 | tests.md + interfaces.md |
 ```
 
-### Step 5: RECORD — 설계 관점 기록
-
-설계 문서 기반으로 구현을 진행한 후, 설계→구현 갭이 발견되면 기록:
-- "설계서엔 X라 했는데 구현하니 Y가 필요했다"
-- "이 타입이 설계서에 없어서 구현 중에 추가해야 했다"
-- "에러 흐름이 빠져서 구현 중에 판단이 필요했다"
-
-발견된 관점을 `~/.bunnie-workflows/strategy/design/perspectives.md` 에 추가:
-
-```bash
-mkdir -p ~/.bunnie-workflows/strategy/design
-```
-
-유래 정보와 함께 기록:
-```markdown
-> 유래: YYYY-MM-DD [프로젝트명]에서 [기능명] 설계→구현 갭
-```
-
-### Step 6: PROPAGATE — 전파
-
-`~/.bunnie-workflows/strategy/design/`은 같은 머신의 모든 프로젝트가 공유. 다음 설계 문서 생성 시 축적된 관점이 Step 2에서 자동 반영.
-
 ### 보고
 
 사용자에게 결과 보고:
 - 생성된 문서 목록
 - 검증 결과
 - 에이전트 참조 가이드
+
+### 설계→구현 갭 기록
+
+이 스킬이 직접 하지 않는다. 구현 중에 설계 갭이 발견되면 CLAUDE.md의 "설계→구현 갭 발견 시" 글로벌 규칙이 자동으로 `~/.bunnie-workflows/strategy/design/perspectives.md`에 기록한다. 다음 설계 문서 생성 시 Step 2에서 축적된 관점이 자동 반영.

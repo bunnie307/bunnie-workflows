@@ -27,6 +27,18 @@
 
 검증 실패 시 자동 보강. 외부 일관성(다른 설계 문서와의 모순)은 검증하지 않는다.
 
+## 구체성 기준
+
+"에이전트가 질문 없이 구현할 수 있는 수준"의 기준:
+
+- **타입 정의**: 프로젝트 언어(TypeScript, Go 등)의 실제 코드로 작성. 자연어 설명 금지.
+- **흐름**: 함수명과 인터페이스를 명시. "데이터를 처리한다" 가 아니라 "OrderCancelUseCase.execute(input: CancelOrderInput): CancelOrderOutput" 수준.
+- **에러**: enum 값 + HTTP 상태코드. "에러 반환" 이 아니라 "ErrorCode.ORDER_NOT_FOUND, 404".
+- **테스트**: 입력값과 기대 결과를 구체적으로. "주문 취소를 테스트" 가 아니라 "입력: orderId='non-existent', 기대: ErrorCode.ORDER_NOT_FOUND 404".
+- **파일 경로**: 프로젝트 CLAUDE.md의 아키텍처 규칙에 맞는 정확한 경로. "적절한 위치" 금지.
+
+모호성 금지 표현: "적절히", "필요에 따라", "등등", "일반적으로". 이런 표현이 있으면 구체화한다.
+
 ## 각 파일의 형식
 
 ### README.md
