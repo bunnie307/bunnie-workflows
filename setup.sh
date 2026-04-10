@@ -2,7 +2,7 @@
 set -e
 
 PLUGIN_DIR="$(cd "$(dirname "$0")" && pwd)"
-GLOBAL_RULES="$PLUGIN_DIR/global-rules.md"
+GLOBAL_RULES="$PLUGIN_DIR/CLAUDE.md"
 TARGET="$HOME/.claude/CLAUDE.md"
 
 echo "=== bunnie-workflows Setup ==="
