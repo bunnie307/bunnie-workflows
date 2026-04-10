@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(strategy/*)",
+      "Read(templates/*)",
+      "Read(skills/*/SKILL.md)"
+    ]
+  }
+}

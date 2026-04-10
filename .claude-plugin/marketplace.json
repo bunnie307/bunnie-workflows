@@ -1,0 +1,13 @@
+{
+  "version": "1",
+  "plugins": {
+    "claude-workflows": {
+      "name": "Claude Workflows",
+      "description": "Self-evolving test strategy and workflow automation",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/bunnie198/claude-workflows.git"
+      }
+    }
+  }
+}
