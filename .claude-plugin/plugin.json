@@ -1,11 +1,11 @@
 {
-  "name": "claude-workflows",
+  "name": "bunnie-workflows",
   "description": "Self-evolving test strategy and workflow automation for Claude Code. Automatically analyzes bugs to discover missing test perspectives, evolves testing strategy, and syncs improvements across projects.",
   "version": "0.1.0",
   "author": {
-    "name": "bunnie198"
+    "name": "bunnie307"
   },
-  "repository": "https://github.com/bunnie198/claude-workflows",
+  "repository": "https://github.com/bunnie307/bunnie-workflows",
   "license": "MIT",
   "keywords": ["testing", "test-strategy", "workflow", "automation", "quality"]
 }

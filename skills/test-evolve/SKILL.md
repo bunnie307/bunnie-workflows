@@ -40,12 +40,12 @@ description: 버그 수정 후 테스트 전략을 자동 발전시키는 스킬
 ### Step 4: 플러그인 동기화
 
 새 관점이 발견된 경우:
-1. `claude-workflows/strategy/perspectives.md`에 새 관점 추가
+1. `bunnie-workflows/strategy/perspectives.md`에 새 관점 추가
 2. 유래 정보 기록 (어느 프로젝트, 어떤 버그에서 발견)
 3. 플러그인 레포에 커밋/푸시
 
 ```bash
-PLUGIN_DIR="${CLAUDE_WORKFLOWS_DIR:-$HOME/workspace/github/bunnie198/claude-workflows}"
+PLUGIN_DIR="${CLAUDE_WORKFLOWS_DIR:-$HOME/workspace/github/bunnie307/bunnie-workflows}"
 cd "$PLUGIN_DIR"
 git add strategy/perspectives.md
 git commit -m "evolve: add [관점명] perspective from [프로젝트명]"
