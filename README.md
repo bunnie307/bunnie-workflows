@@ -31,8 +31,9 @@ bunnie-workflows/
 
 | 스킬 | 유형 | 실행 | 설명 |
 |------|------|------|------|
-| **test-evolve** | 진화 | `/bunnie-workflows:test-evolve` | 버그 → 관점 분석 → 전략 진화 → 동기화 |
+| **test-evolve** | 진화 | `/bunnie-workflows:test-evolve` | 버그 → 관점 분석 → 전략 진화 |
 | **test-audit** | 정적 | `/bunnie-workflows:test-audit` | 관점별 테스트 커버리지 감사 |
+| **sync** | 정적 | `/bunnie-workflows:sync` | 발견된 전략을 플러그인 레포에 PR 동기화 |
 
 ## 스킬 유형
 
