@@ -12,6 +12,26 @@ Claude Code 플러그인 — 자기 발전형 개발 워크플로우 자동화.
 /plugin install bunnie-workflows
 ```
 
+## 빠른 시작
+
+설치 후 프로젝트에서 바로 사용:
+
+```bash
+# 1. 테스트 커버리지 감사 — 현재 테스트 상태를 7관점에서 분석
+/bunnie-workflows:test-audit
+
+# 2. 버그 수정 후 — 누락된 테스트 관점을 분석하고 전략을 진화
+/bunnie-workflows:test-evolve
+
+# 3. 새 프로젝트 시작 — 검증된 스택 번들로 초기화
+/bunnie-workflows:project-init
+
+# 4. 기능 설계 — 에이전트가 구현할 수 있는 수준의 설계 문서 생성
+/bunnie-workflows:design-spec
+```
+
+처음이라면 `/bunnie-workflows:test-audit`부터 실행해보세요. 프로젝트의 테스트 현황을 관점별로 보여줍니다.
+
 ## 구조
 
 ```
@@ -61,12 +81,6 @@ bunnie-workflows/
 
 프로젝트에서 새 관점이 발견되면 자동으로 8, 9, ... 번째 관점이 추가됩니다.
 
-## 새 스킬 추가
+## 개발
 
-1. `templates/skill-template.md`에서 진화 또는 정적 템플릿을 복사
-2. `skills/[name]/SKILL.md`에 저장
-3. 진화 스킬이면 `strategy/[domain]/` 디렉토리에 전략 파일도 생성 (`templates/strategy-template.md` 참조)
-
-## 신규 프로젝트 적용
-
-`templates/project-claude.md`를 프로젝트 CLAUDE.md에 복사하거나, 플러그인 설치 후 CLAUDE.md에 테스트 관점 섹션이 없으면 자동으로 초기화를 제안합니다.
+플러그인에 새 스킬을 추가하거나 구조를 변경하려면 [DEVELOPMENT.md](DEVELOPMENT.md)를 참조.
