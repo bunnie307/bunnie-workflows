@@ -1,13 +1,16 @@
 {
-  "version": "1",
-  "plugins": {
-    "bunnie-workflows": {
-      "name": "Claude Workflows",
-      "description": "Self-evolving test strategy and workflow automation",
+  "name": "bunnie-workflows",
+  "owner": {
+    "name": "bunnie307"
+  },
+  "plugins": [
+    {
+      "name": "bunnie-workflows",
+      "description": "Self-evolving development workflow automation for Claude Code",
       "source": {
         "type": "git",
         "url": "https://github.com/bunnie307/bunnie-workflows.git"
       }
     }
-  }
+  ]
 }
