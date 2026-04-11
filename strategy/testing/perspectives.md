@@ -38,3 +38,31 @@
 - 같은 입력이 두 번 들어와도 결과가 동일한지
 - 메시지 중복 수신, API 재요청 등
 - 동시 요청 시 레이스 컨디션
+
+## 프로젝트 발견
+
+### 8. Error Classification — 에러의 HTTP 상태 코드 매핑 검증
+- 사용자 입력 검증 실패 → 400 BadRequestException
+- 리소스 미발견 → 404 NotFoundException
+- 중복/충돌 → 409 ConflictException
+- 인증 실패 → 401 UnauthorizedException
+- 권한 부족 → 403 ForbiddenException
+- 인프라 불가용 → 503 ServiceUnavailableException
+- 도메인 에러 → VcalmError (status 필드로 매핑)
+- generic `new Error()` 사용 금지 (500으로 매핑되어 클라이언트가 재시도 불가)
+- 가드 테스트: `grep -rn "throw new Error(" --include="*.ts"` 결과가 프로덕션 코드에서 0건이어야 함
+> 유래: 2026-04-11 vcalm, CreateWorkflowUsecase에서 입력 검증 실패(initialStep not found)가 generic Error로 던져져 500 반환. KeysController에서도 인프라 불가용이 generic Error로 500 반환. 두 건 모두 수정 후 관점 추가.
+
+### 9. Consumer-Driven Contract — 소비자가 의존하는 API 엔드포인트 및 요청 형식 검증
+- 프론트엔드 hook/client가 호출하는 모든 API 경로가 백엔드에 라우트로 등록되어 있는가?
+- 프론트엔드가 사용하는 HTTP 메서드(GET/POST/PATCH/DELETE)가 해당 라우트에서 지원되는가?
+- 기본 테스트 계정의 scope가 대시보드에서 사용하는 모든 엔드포인트를 커버하는가?
+- monorepo에서 `.env` 경로가 모든 앱(API, Dashboard 등)에서 올바르게 로드되는가?
+- 검증 방법: supertest로 각 경로에 요청 → 404가 아니면 통과 (401/403은 라우트 존재를 의미)
+- 가드 테스트: 프론트엔드 hook에서 `apiClient.*` 호출을 추출하여 API 라우트 목록과 대조
+- **요청 페이로드 정합성**: 프론트엔드 폼이 보내는 요청 바디가 API DTO의 class-validator 검증을 통과하는가?
+  - 올바른 페이로드로 supertest 요청 → 400이 아니면 DTO 구조 일치 확인 (401/500은 허용)
+  - 잘못된 필드명(proofFormat vs securingMechanism)이 forbidNonWhitelisted로 거부되는가?
+  - 필수 필드 누락(did, verificationMethod)이 class-validator로 검출되는가?
+  - AuthGuard가 ValidationPipe보다 먼저 실행되므로, 잘못된 페이로드는 plainToInstance + validate()로 정적 검증
+> 유래: 2026-04-11 vcalm, 대시보드 hooks가 GET /entities 등 호출하지만 API에 리스트 엔드포인트 미구현 → 404. credential 발급 폼이 proofFormat을 보냈지만 API는 securingMechanism+cryptosuite 기대 → 400. Entity 생성 폼에 did 필드 누락 → 400. 키 생성 없이 발급 → 500.
