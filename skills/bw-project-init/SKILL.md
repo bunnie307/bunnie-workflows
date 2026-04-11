@@ -1,5 +1,5 @@
 ---
-name: project-init
+name: bw-project-init
 description: 검증된 스택 번들로 프로젝트를 초기화하고, 초기화 과정에서 발견된 패턴을 축적한다.
 ---
 

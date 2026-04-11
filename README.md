@@ -18,19 +18,19 @@ Claude Code 플러그인 — 자기 발전형 개발 워크플로우 자동화.
 
 ```bash
 # 1. 테스트 커버리지 감사 — 현재 테스트 상태를 7관점에서 분석
-/bunnie-workflows:test-audit
+/bw-test-audit
 
 # 2. 버그 수정 후 — 누락된 테스트 관점을 분석하고 전략을 진화
-/bunnie-workflows:test-evolve
+/bw-test-evolve
 
 # 3. 새 프로젝트 시작 — 검증된 스택 번들로 초기화
-/bunnie-workflows:project-init
+/bw-project-init
 
 # 4. 기능 설계 — 에이전트가 구현할 수 있는 수준의 설계 문서 생성
-/bunnie-workflows:design-spec
+/bw-design-spec
 ```
 
-처음이라면 `/bunnie-workflows:test-audit`부터 실행해보세요. 프로젝트의 테스트 현황을 관점별로 보여줍니다.
+처음이라면 `/bw-test-audit`부터 실행해보세요. 프로젝트의 테스트 현황을 관점별로 보여줍니다.
 
 ## 구조
 
@@ -56,11 +56,11 @@ bunnie-workflows/
 
 | 스킬 | 유형 | 실행 | 설명 |
 |------|------|------|------|
-| **test-evolve** | 진화 | `/bunnie-workflows:test-evolve` | 버그 → 관점 분석 → 전략 진화 |
-| **test-audit** | 정적 | `/bunnie-workflows:test-audit` | 관점별 테스트 커버리지 감사 |
-| **project-init** | 진화 | `/bunnie-workflows:project-init` | 검증된 스택 번들로 프로젝트 초기화 |
-| **design-spec** | 진화 | `/bunnie-workflows:design-spec` | 에이전트 실행 가능한 설계 문서 생성 |
-| **sync** | 정적 | `/bunnie-workflows:sync` | 발견된 전략을 플러그인 레포에 PR 동기화 |
+| **bw-test-evolve** | 진화 | `/bw-test-evolve` | 버그 → 관점 분석 → 전략 진화 |
+| **bw-test-audit** | 정적 | `/bw-test-audit` | 관점별 테스트 커버리지 감사 |
+| **bw-project-init** | 진화 | `/bw-project-init` | 검증된 스택 번들로 프로젝트 초기화 |
+| **bw-design-spec** | 진화 | `/bw-design-spec` | 에이전트 실행 가능한 설계 문서 생성 |
+| **bw-sync** | 정적 | `/bw-sync` | 발견된 전략을 플러그인 레포에 PR 동기화 |
 
 ## 스킬 유형
 
@@ -75,7 +75,7 @@ bunnie-workflows/
 2. 프로젝트 CLAUDE.md에 발견된 관점을 추가
 3. `~/.bunnie-workflows/strategy/`에 유래(provenance)와 함께 기록
 4. 같은 머신의 모든 프로젝트가 이 디렉토리를 공유하므로 자동 전파
-5. `/bunnie-workflows:sync`로 플러그인 레포에 PR을 보내면 다른 사용자에게도 배포
+5. `/bw-sync`로 플러그인 레포에 PR을 보내면 다른 사용자에게도 배포
 
 ## 테스트 관점 (기본 7개)
 

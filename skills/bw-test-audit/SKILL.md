@@ -1,5 +1,5 @@
 ---
-name: test-audit
+name: bw-test-audit
 description: 프로젝트의 테스트 커버리지를 관점별로 감사하고, 누락된 영역을 보고한다.
 ---
 

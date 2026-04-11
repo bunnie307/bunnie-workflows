@@ -1,5 +1,5 @@
 ---
-name: test-evolve
+name: bw-test-evolve
 description: 버그 수정 후 테스트 전략을 자동 발전시키는 진화 스킬. 누락된 테스트 관점을 분석하고, 전략을 업데이트하고, 동일 패턴 모듈에 테스트를 보강한다.
 ---
 

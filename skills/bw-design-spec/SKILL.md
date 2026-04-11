@@ -1,5 +1,5 @@
 ---
-name: design-spec
+name: bw-design-spec
 description: Generate design documents optimized for AI agent implementation. Produces structured, self-validating specs with implementation units that agents can execute one at a time without questions.
 ---
 

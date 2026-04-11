@@ -1,5 +1,5 @@
 ---
-name: sync
+name: bw-sync
 description: 발견된 전략을 플러그인 레포에 PR로 동기화한다.
 ---
 
