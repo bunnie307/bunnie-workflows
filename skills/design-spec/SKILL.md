@@ -116,34 +116,32 @@ If requirements are clear enough to proceed without questions, skip this step.
 
 **Generation order (follow strictly):**
 
-**4a. Summary** — purpose, trigger, scope, prerequisites, open questions
+**4a. 개요 & 아키텍처 뷰** — purpose, trigger, scope, 서비스 맵(의존성 다이어그램), 서비스 간 계약, 공통 규칙
 
-**4b. Codebase Context** — populated entirely from Step 1 findings
-- Reference implementations (actual file paths verified in the codebase)
-- Reusable code (actual imports verified in the codebase)
-- Wiring instructions (actual module files verified in the codebase)
-- Naming conventions (extracted from actual code, not assumed)
+**4b. Codebase Context** — Step 1 결과를 기록
+- Reference implementations (실제 코드베이스에서 검증된 경로)
+- Reuse (DO NOT recreate 목록)
+- Wiring (모듈 등록, import 경로)
+- Naming conventions (코드베이스에서 추출)
 
-**4c. Types Registry** — single source of truth
-- Write ALL types as TypeScript interfaces/enums
-- Mark each type as `NEW` or `EXTEND` (with file path for EXTEND)
-- Include the Error Mapping table (ErrorCode → HTTP status → trigger condition)
-- No natural language type descriptions. If you can't define it as code, the requirement is ambiguous — go back to Step 3.
+**4c. Types Registry** — 전체 기능의 타입 정본
+- 프로젝트 언어(TypeScript 등)의 실제 코드로 작성
+- NEW / EXTEND 구분 (EXTEND는 기존 파일 경로 명시)
+- Error Mapping 테이블 (ErrorCode → HTTP status → 조건)
+- 자연어 타입 설명 금지. 코드로 정의 불가하면 요구사항이 모호한 것 → Step 3으로 복귀
 
-**4d. Data Model** (if needed) — Prisma schema changes
-- Show new models and modifications to existing models
-- Specify migration strategy and backfill requirements
+**4d. Data Model** (conditional) — Prisma 스키마 변경, 마이그레이션 노트
 
-**4e. Implementation Units** — the core deliverable
-- Decompose the feature into 2-6 units
-- Each unit is a vertical slice: types + logic + test for one coherent piece
-- Each unit has: depends_on, files, type context (copied from Registry), flow, error paths, acceptance criteria, tests
-- Order units as a DAG: dependencies before dependents
-- Each unit should modify at most 5 files. If more, split it.
+**4e. Service Blocks** — 서비스(또는 모듈)별로 그룹핑
+- 각 서비스 블록에 소유 범위, Publishes/Consumes 명시
+- 블록 안에 implementation units 배치 (2-6개/서비스)
+- 각 unit: depends_on, files, type context(Registry에서 복사), flow(인라인 시그니처), error paths, acceptance criteria, tests
+- unit은 DAG 순서. 서비스 간 의존은 `[ServiceName].Unit N` 형태
+- 각 unit 최대 5파일. 초과 시 분리
 
-**4f. Cross-Cutting Concerns** (if needed) — Kafka topics, transactions, auth, idempotency
+**4f. Cross-Cutting Concerns** (conditional) — Kafka topics, transactions, auth, idempotency
 
-**4g. Validation Checklist** — auto-verified (see below)
+**4g. Validation Checklist** — schema.md의 검증 규칙 실행
 
 ---
 
@@ -152,11 +150,11 @@ If requirements are clear enough to proceed without questions, skip this step.
 Run every check from the **Validation Checklist** defined in `strategy/design/schema.md`. The canonical checklist lives there — do not maintain a separate list here.
 
 The checklist covers five categories:
-1. **Type Integrity** — every type/field/ErrorCode used in units exists in the Types Registry
-2. **Unit DAG Integrity** — `depends_on` references are valid, no cycles, topological order
-3. **File Path Integrity** — [MODIFY] files exist, [CREATE] files don't, naming conventions match
-4. **Codebase Context Integrity** — all referenced paths/imports actually exist in the codebase
-5. **Completeness** — error paths, tests, event payloads, no vague language
+1. **Type Integrity** — type context가 Registry와 일치, ErrorCode가 Error Mapping에 존재
+2. **Service/Unit DAG Integrity** — depends_on 유효, 순환 없음, 서비스 간 의존이 아키텍처 뷰와 일치
+3. **File Path Integrity** — [MODIFY] 파일 존재, [CREATE] 파일 미존재, 네이밍 규칙 일치
+4. **Codebase Context Integrity** — 참조 경로/import가 실제 존재
+5. **Completeness** — error path, tests, event payload, 모호한 표현 없음
 
 For file path and codebase context checks, use Glob/Grep to verify against the actual codebase — do not rely on memory.
 
