@@ -7,10 +7,7 @@
     {
       "name": "bunnie-workflows",
       "description": "Self-evolving development workflow automation for Claude Code",
-      "source": {
-        "type": "git",
-        "url": "https://github.com/bunnie307/bunnie-workflows.git"
-      }
+      "source": "./"
     }
   ]
 }
