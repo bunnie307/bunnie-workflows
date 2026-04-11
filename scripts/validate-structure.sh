@@ -63,12 +63,12 @@ for skill_dir in skills/*/; do
     hint "SKILL.md 상단 YAML frontmatter에 description: 을 추가하세요."
   fi
 
-  # 스킬 유형 선언 (진화 스킬 또는 정적 스킬)
-  if grep -q "유형.*스킬" "$skill_file"; then
+  # 스킬 유형 선언 (한글 또는 영문)
+  if grep -qi "유형.*스킬\|Type:.*skill" "$skill_file"; then
     pass "$skill_name: 유형 선언"
   else
     fail "$skill_name: 유형 선언 없음"
-    hint "SKILL.md 본문에 **유형:** 진화 스킬 또는 **유형:** 정적 스킬 을 추가하세요."
+    hint "SKILL.md 본문에 **유형:** 진화 스킬 또는 **Type:** Evolution skill 을 추가하세요."
   fi
 done
 
