@@ -1,174 +1,386 @@
-# 설계 문서 스키마
+# Design Document Schema
 
-모든 설계 문서는 이 스키마를 따른다. `docs/design/[feature-name]/` 디렉토리에 생성.
+All design documents follow this schema.
 
-## 파일 구조
+## Core Principle: Implementation Units
 
-### 필수
-- **README.md** — 요약, 선행조건, 미결사항, 에이전트 참조 가이드
-- **context.md** — 기존 코드 재사용 정보, 참조 구현, 와이어링, 네이밍 규칙
+The document is organized around **implementation units** — independently implementable vertical slices. An agent reads one unit at a time and implements it without loading the full document. Units form a DAG via `depends_on`, giving the agent a clear implementation order.
 
-### 기능 유형에 따라 포함
-- **interfaces.md** — API 엔드포인트, 이벤트, 타입 정의 (API/이벤트가 있을 때)
-- **data-model.md** — 스키마 변경, 마이그레이션 (DB 변경이 있을 때)
-- **implementation.md** — phase별 구현 계획 + 흐름 + 파일 목록 (비즈니스 로직이 있을 때, 항상 권장)
-- **tests.md** — 관점별 테스트 계획 (항상 권장, 구현보다 먼저 작성)
+## Output Format
 
-빈 파일은 만들지 않는다.
+**기본: 단일 파일** — `docs/design/[feature-name].md`
 
-## 검증 규칙
+**분리 조건:** unit이 6개 이상이거나 문서가 500줄을 넘으면 자동 분리:
 
-문서 생성 후 아래 4가지만 기계적으로 검증한다:
-
-1. **타입명 존재**: implementation.md에서 참조하는 모든 타입명이 interfaces.md에 정의되어 있는가
-2. **에러코드 매칭**: implementation.md의 에러 흐름에서 사용하는 에러코드가 interfaces.md의 에러 응답에 정의되어 있는가
-3. **파일경로 참조**: implementation.md의 모든 파일 경로가 context.md 또는 interfaces.md에서 참조되는가
-4. **인라인 시그니처 일치**: implementation.md의 인라인 타입 시그니처가 interfaces.md의 정의와 일치하는가
-
-검증 실패 시 자동 보강.
-
-## 구체성 기준
-
-"에이전트가 질문 없이 구현할 수 있는 수준"의 기준:
-
-- **타입 정의**: 프로젝트 언어(TypeScript, Go 등)의 실제 코드로 작성. 자연어 설명 금지.
-- **흐름**: 함수명과 인라인 타입 시그니처를 명시. `UseCase.execute(input: CancelOrderInput { orderId: string, reason: CancelReason }): CancelOrderOutput { cancelledAt: Date }` 수준.
-- **에러**: enum 값 + HTTP 상태코드. "에러 반환" 이 아니라 "ErrorCode.ORDER_NOT_FOUND, 404".
-- **테스트**: 입력값과 기대 결과를 구체적으로.
-- **파일 경로**: 프로젝트 CLAUDE.md의 아키텍처 규칙에 맞는 정확한 경로. "적절한 위치" 금지.
-
-모호성 금지 표현: "적절히", "필요에 따라", "등등", "일반적으로". 이런 표현이 있으면 구체화한다.
-
-## 각 파일의 형식
-
-### README.md
-```markdown
-# [기능명]
-
-## 요약
-[한 줄 목적]
-
-## 선행조건
-- [의존하는 설계 문서 또는 구현, 없으면 "없음"]
-
-## 미결사항
-- [결정되지 않은 것, 없으면 "없음"]
-
-## 에이전트 참조 가이드
-| 구현 단계 | 참조 문서 |
-|-----------|-----------|
-| 시작 전 | context.md (참조 구현 파일 읽기) |
-| 데이터 모델 | data-model.md |
-| 구현 (phase별) | implementation.md + interfaces.md |
-| 와이어링 | context.md |
-| 테스트 | tests.md + interfaces.md |
+```
+docs/design/[feature-name]/
+  index.md              # Summary + Codebase Context + Types Registry + Data Model + Cross-Cutting + Validation
+  unit-1-[name].md      # Unit 1 (depends_on, files, type context, flow, error paths, tests)
+  unit-2-[name].md      # Unit 2
+  ...
 ```
 
-### context.md
-```markdown
-# 구현 컨텍스트
+각 unit 파일은 self-contained. type context가 Types Registry에서 복사되어 있으므로 에이전트는 index.md를 먼저 읽고, 구현할 unit 파일만 읽으면 된다.
 
-## 참조 구현
-- UseCase 패턴: `[기존 유사 UseCase 경로]`
-- Controller 패턴: `[기존 유사 Controller 경로]`
-- 테스트 패턴: `[기존 유사 테스트 경로]`
+## Document Structure (단일 파일 시)
 
-## 재사용 (새로 만들지 않는다)
-- 기본 예외: `[경로]`
-- 페이지네이션: `[경로]`
-- 인증 가드: `[경로]`
-- 응답 래퍼: `[경로]`
+```
+# [Feature Name]
 
-## 와이어링
-- 모듈 등록: `[모듈 파일 경로]`의 providers 배열에 추가
-- Import 경로: `[공유 라이브러리 import 경로]`
-- 이벤트/토픽 등록: `[토픽 정의 파일 경로]`
-
-## 네이밍 규칙 (코드베이스에서 감지)
-- UseCase 메서드: `execute(input: XxxInput): Promise<XxxOutput>`
-- Repository 메서드: `[프로젝트에서 사용하는 패턴]`
-- 에러 메시지 형식: `[프로젝트에서 사용하는 형식]`
+## Summary
+## Codebase Context
+## Types Registry
+## Data Model
+## Implementation Units
+  ### Unit 1: [Name]
+  ### Unit 2: [Name]
+  ...
+## Cross-Cutting Concerns
+## Validation Checklist (auto-verified)
 ```
 
-### interfaces.md
+Every section below is required unless marked `(conditional)`.
+
+---
+
+## Section: Summary
+
 ```markdown
-# 인터페이스 정의
+## Summary
 
-## API 엔드포인트
-### [METHOD] [PATH]
-- Request: [타입 코드블록]
-- Response: [타입 코드블록]
-- 에러: [에러코드 + HTTP 상태]
+**Purpose:** [One sentence — what does this feature do for the user]
+**Trigger:** [What causes this feature to execute: HTTP request, Kafka message, cron, user action]
+**Scope:** [What is IN scope and what is explicitly OUT of scope]
 
-## 이벤트/메시지
-### [TOPIC]
-- Payload: [타입 코드블록]
+### Prerequisites
+- [Dependency on other features/PRs, or "None"]
 
-## 내부 인터페이스
-### [UseCase명]
-- Input: [타입 코드블록]
-- Output: [타입 코드블록]
-
-## NEW vs EXTEND
-- NEW: 새로 생성하는 타입에는 [NEW] 표기
-- EXTEND: 기존 타입에 필드 추가 시 [EXTEND 경로] 표기와 추가 필드만 명시
+### Open Questions
+- [Unresolved decisions. If none, write "None — all decisions are captured below"]
 ```
 
-### data-model.md
+Why this exists: Agents need to know the boundary. Without explicit scope, they build adjacent features. Without prerequisites, they attempt to build on code that doesn't exist yet.
+
+---
+
+## Section: Codebase Context
+
 ```markdown
-# 데이터 모델
+## Codebase Context
 
-## 스키마 변경
-[Prisma 스키마 코드블록]
+### Reference Implementations
+Copy the patterns from these existing files:
+- Controller pattern: `src/order/order.controller.ts`
+- UseCase pattern: `src/order/use-cases/create-order.use-case.ts`
+- Service pattern: `src/order/order.service.ts`
+- Test pattern: `src/order/__tests__/create-order.use-case.spec.ts`
 
-## 마이그레이션
-- 마이그레이션 필요 여부
-- 기존 데이터 영향
+### Reuse (DO NOT recreate)
+These already exist. Import them:
+- Base exception: `import { BusinessException } from '@app/common/exceptions/business.exception'`
+- Pagination: `import { PaginationDto } from '@app/common/dto/pagination.dto'`
+- Auth guard: `import { JwtAuthGuard } from '@app/auth/guards/jwt-auth.guard'`
+- Response wrapper: `import { ApiResponse } from '@app/common/dto/api-response.dto'`
+
+### Wiring
+- Module registration: Add to `providers` array in `src/order/order.module.ts`
+- Module imports: Import `PrismaModule` from `@app/prisma`
+- Topic registration: Add topic constant to `src/common/constants/kafka-topics.ts`
+
+### Naming Conventions (detected from codebase)
+- UseCase method: `execute(input: XxxInput): Promise<XxxOutput>`
+- Repository method: `findById`, `findMany`, `create`, `update`, `delete`
+- Error code format: `ErrorCode.ENTITY_ACTION_REASON` (e.g., `ErrorCode.ORDER_NOT_FOUND`)
+- File naming: `kebab-case.use-case.ts`, `kebab-case.controller.ts`
+- Test naming: `kebab-case.use-case.spec.ts`
 ```
 
-### implementation.md
+Why this exists: This is the highest-value section. Without it, agents reinvent existing utilities, use wrong import paths, and break naming conventions. Every path must be verified against the actual codebase during generation.
+
+---
+
+## Section: Types Registry
+
+Single source of truth for all types in this feature. Every type referenced anywhere in the document must be defined here.
+
 ```markdown
-# 구현 계획
+## Types Registry
 
-## 구현 순서
-테스트 → 타입/인터페이스 → 데이터 레이어 → 비즈니스 로직 → API 레이어 → 와이어링
+### NEW Types
 
-## Phase 1: 타입 및 인터페이스
-**파일:**
-- `[경로]` — [역할] [CREATE/MODIFY]
+```typescript
+// --- Request/Response ---
 
-**완료 조건:** `tsc --noEmit` 통과
+interface CreateOrderRequest {
+  productId: string;
+  quantity: number; // min: 1, max: 100
+  shippingAddressId: string;
+  couponCode?: string; // optional, validated against coupon service
+}
 
-## Phase 2: 데이터 레이어
-**파일:**
-- `[경로]` — [역할] [CREATE/MODIFY]
+interface CreateOrderResponse {
+  orderId: string;
+  totalAmount: number;
+  estimatedDelivery: Date;
+}
 
-**흐름:**
-1. [함수명(input: InputType { field: type }): OutputType 수준의 인라인 시그니처]
-2. [다음 단계]
+// --- UseCase I/O ---
 
-**에러 흐름:**
-- 조건: [언제], 에러코드: ErrorCode.XXX, 응답: [HTTP 상태]
+interface CreateOrderInput {
+  productId: string;
+  quantity: number;
+  shippingAddressId: string;
+  couponCode: string | null;
+  userId: string; // extracted from JWT by controller
+}
 
-**완료 조건:** prisma generate 성공 + 유닛 테스트 통과
+interface CreateOrderOutput {
+  orderId: string;
+  totalAmount: number;
+  estimatedDelivery: Date;
+}
 
-## Phase N: ...
-(같은 구조 반복)
+// --- Events ---
+
+interface OrderCreatedEvent {
+  orderId: string;
+  userId: string;
+  totalAmount: number;
+  createdAt: Date;
+}
+
+// --- Enums ---
+
+enum OrderStatus {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  CANCELLED = 'CANCELLED',
+}
+
+enum ErrorCode {
+  PRODUCT_NOT_FOUND = 'PRODUCT_NOT_FOUND',
+  PRODUCT_OUT_OF_STOCK = 'PRODUCT_OUT_OF_STOCK',
+  INVALID_COUPON = 'INVALID_COUPON',
+  SHIPPING_ADDRESS_NOT_FOUND = 'SHIPPING_ADDRESS_NOT_FOUND',
+}
 ```
 
-### tests.md
-```markdown
-# 테스트 계획
+### EXTEND Types (add fields to existing types)
 
-## 구현 순서
-tests.md의 테스트는 해당 phase의 구현보다 먼저 작성한다 (TDD).
-
-## Phase 1 테스트
-- [ ] [테스트 항목]: 입력 [X], 기대 [Y]
-
-## Phase 2 테스트
-- [ ] [테스트 항목]: 입력 [X], 기대 [Y]
-
-## 통합 테스트 (전체 구현 완료 후)
-- [ ] [테스트 항목]: 입력 [X], 기대 [Y]
+```typescript
+// EXTEND: src/order/types/order.types.ts
+// Add to existing Order interface:
+interface Order {
+  // ... existing fields ...
+  cancelledAt?: Date;     // NEW FIELD
+  cancelReason?: string;  // NEW FIELD
+}
 ```
+
+### Error Mapping
+
+| ErrorCode | HTTP Status | When |
+|-----------|-------------|------|
+| PRODUCT_NOT_FOUND | 404 | productId doesn't match any active product |
+| PRODUCT_OUT_OF_STOCK | 409 | product.stock < requested quantity |
+| INVALID_COUPON | 422 | coupon expired, already used, or doesn't exist |
+| SHIPPING_ADDRESS_NOT_FOUND | 404 | shippingAddressId not found for this user |
+```
+
+Why this exists: Problems #5 (hallucinated field names) happens because types are defined in one file and used in another. The registry is the single source. Implementation units inline relevant type excerpts from this registry — but the registry is the canonical version.
+
+---
+
+## Section: Data Model (conditional)
+
+Include only when Prisma schema changes are needed.
+
+```markdown
+## Data Model
+
+### Schema Changes
+
+```prisma
+// NEW model
+model OrderCancellation {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  reason    String
+  cancelledBy String
+  cancelledAt DateTime @default(now())
+
+  order     Order    @relation(fields: [orderId], references: [id])
+}
+
+// MODIFY: add relation to existing Order model
+model Order {
+  // ... existing fields ...
+  cancellation OrderCancellation?  // ADD THIS LINE
+}
+```
+
+### Migration Notes
+- Non-breaking: new table only, no column changes to existing tables
+- Backfill: not required
+- Run: `npx prisma migrate dev --name add-order-cancellation`
+```
+
+---
+
+## Section: Implementation Units
+
+This is the core of the document. Each unit is a vertical slice that can be implemented independently.
+
+### Unit Format
+
+```markdown
+### Unit [N]: [Descriptive Name]
+
+**depends_on:** [Unit numbers this depends on, or "none"]
+**files:**
+- `src/order/dto/cancel-order.dto.ts` — CancelOrderRequest/Response DTOs [CREATE]
+- `src/order/use-cases/cancel-order.use-case.ts` — cancellation business logic [CREATE]
+- `src/order/order.controller.ts` — add DELETE /orders/:id endpoint [MODIFY]
+- `src/order/order.module.ts` — register CancelOrderUseCase [MODIFY]
+
+**type context** (excerpt from Types Registry for this unit):
+```typescript
+interface CancelOrderInput {
+  orderId: string;
+  reason: CancelReason;
+  userId: string;
+}
+
+interface CancelOrderOutput {
+  cancelledAt: Date;
+}
+
+enum CancelReason {
+  CHANGED_MIND = 'CHANGED_MIND',
+  FOUND_CHEAPER = 'FOUND_CHEAPER',
+  OTHER = 'OTHER',
+}
+```
+
+**flow:**
+1. `OrderController.cancel(@Param('id') orderId: string, @Body() dto: CancelOrderRequest, @CurrentUser() user: User): Promise<ApiResponse<CancelOrderResponse>>`
+2. Controller extracts `userId` from `user`, constructs `CancelOrderInput`, calls `CancelOrderUseCase.execute(input)`
+3. `CancelOrderUseCase.execute(input: CancelOrderInput): Promise<CancelOrderOutput>`
+   - Call `this.prisma.order.findUnique({ where: { id: input.orderId } })`
+   - If not found: throw `new BusinessException(ErrorCode.ORDER_NOT_FOUND, 404)`
+   - If `order.userId !== input.userId`: throw `new BusinessException(ErrorCode.ORDER_ACCESS_DENIED, 403)`
+   - If `order.status !== OrderStatus.PENDING`: throw `new BusinessException(ErrorCode.ORDER_NOT_CANCELLABLE, 409)`
+   - Call `this.prisma.order.update({ where: { id: input.orderId }, data: { status: OrderStatus.CANCELLED, cancelledAt: new Date() } })`
+   - Publish `OrderCancelledEvent` to topic `order.cancelled`
+   - Return `{ cancelledAt: updatedOrder.cancelledAt }`
+
+**error paths:**
+| Condition | ErrorCode | HTTP | Test Input |
+|-----------|-----------|------|------------|
+| Order doesn't exist | ORDER_NOT_FOUND | 404 | `orderId: 'nonexistent-id'` |
+| User doesn't own order | ORDER_ACCESS_DENIED | 403 | `userId: 'other-user'` |
+| Order already shipped | ORDER_NOT_CANCELLABLE | 409 | `order.status: 'SHIPPED'` |
+
+**acceptance criteria:**
+- [ ] `DELETE /orders/:id` returns 200 with `cancelledAt` timestamp
+- [ ] Order status changes to CANCELLED in database
+- [ ] `OrderCancelledEvent` published to `order.cancelled` topic
+- [ ] Returns 404 for nonexistent order
+- [ ] Returns 403 when user doesn't own the order
+- [ ] Returns 409 when order status is not PENDING
+
+**tests:**
+- [ ] Unit: CancelOrderUseCase — happy path: input `{ orderId: 'order-1', reason: 'CHANGED_MIND', userId: 'user-1' }`, mock order exists and is PENDING, expect `cancelledAt` to be defined
+- [ ] Unit: CancelOrderUseCase — order not found: input `{ orderId: 'nonexistent' }`, expect `BusinessException` with `ORDER_NOT_FOUND`
+- [ ] Unit: CancelOrderUseCase — access denied: input `{ userId: 'wrong-user' }`, mock order owned by different user, expect `BusinessException` with `ORDER_ACCESS_DENIED`
+- [ ] Unit: CancelOrderUseCase — not cancellable: mock order with status SHIPPED, expect `BusinessException` with `ORDER_NOT_CANCELLABLE`
+- [ ] Unit: CancelOrderUseCase — event published: verify `kafkaProducer.send` called with topic `order.cancelled` and correct payload
+```
+
+### Unit Ordering Rules
+
+1. Units with `depends_on: none` come first
+2. Data model units before business logic units
+3. Type/DTO units before units that use them
+4. Test files are created within each unit (not a separate phase)
+5. The DAG must be acyclic — circular dependencies indicate a design problem
+
+---
+
+## Section: Cross-Cutting Concerns (conditional)
+
+Include when the feature touches shared infrastructure.
+
+```markdown
+## Cross-Cutting Concerns
+
+### Kafka Topics
+| Topic | Producer | Consumer | Payload Type |
+|-------|----------|----------|-------------|
+| order.cancelled | CancelOrderUseCase | notification-service (external) | OrderCancelledEvent |
+| order.cancelled | CancelOrderUseCase | billing-service (external) | OrderCancelledEvent |
+
+### Database Transactions
+- CancelOrderUseCase: order update + event publish must be atomic. Use `this.prisma.$transaction()` wrapping the update, then publish event outside transaction (at-least-once delivery).
+
+### Auth/Permissions
+- `DELETE /orders/:id` requires `JwtAuthGuard` + ownership check (user can only cancel own orders)
+
+### Rate Limiting / Idempotency
+- No rate limiting needed (destructive operation, single use)
+- Idempotency: cancelling an already-cancelled order returns 409 (not 200), so not idempotent by design
+```
+
+---
+
+## Section: Validation Checklist
+
+This checklist is executed mechanically after document generation. Every item is a yes/no check.
+
+```markdown
+## Validation Checklist
+
+### Type Integrity
+- [ ] Every type name used in any implementation unit's flow/error paths exists in the Types Registry
+- [ ] Every field name used in any implementation unit matches the Types Registry definition (same name, same type)
+- [ ] Every ErrorCode used in error paths is defined in the Types Registry enum
+- [ ] Every ErrorCode has a corresponding row in the Error Mapping table
+
+### Unit DAG Integrity
+- [ ] Every `depends_on` reference points to an existing unit number
+- [ ] No circular dependencies in the unit DAG
+- [ ] Units are listed in topological order (dependencies before dependents)
+
+### File Path Integrity
+- [ ] Every file path in implementation units matches the project's file naming convention
+- [ ] Every [MODIFY] file exists in the current codebase (verified by grep/glob)
+- [ ] Every [CREATE] file does NOT already exist in the current codebase
+- [ ] No two units create the same file
+
+### Codebase Context Integrity
+- [ ] Every path in "Reference Implementations" exists in the codebase
+- [ ] Every import in "Reuse" resolves to an existing module
+- [ ] Module registration path in "Wiring" exists
+
+### Completeness
+- [ ] Every API endpoint has at least one error path defined
+- [ ] Every UseCase has a unit test for happy path + each error path
+- [ ] Every Kafka topic produced has a payload type in the Types Registry
+- [ ] Every [EXTEND] type specifies the file path of the existing type
+- [ ] No occurrence of vague language: "적절히", "필요에 따라", "등등", "일반적으로", "as needed", "appropriately", "etc."
+```
+
+---
+
+## Concreteness Rules
+
+The document must meet this standard: **an agent can implement without asking a single question.**
+
+| Element | Required Level | Bad Example | Good Example |
+|---------|---------------|-------------|--------------|
+| Types | Actual TypeScript code | "order data" | `interface CreateOrderInput { productId: string; quantity: number; }` |
+| Flow | Function signatures with inline types | "validate input" | `UseCase.execute(input: CancelOrderInput { orderId: string }): Promise<CancelOrderOutput>` |
+| Errors | Enum value + HTTP status + trigger condition | "return error" | `ErrorCode.ORDER_NOT_FOUND, 404, when orderId has no matching record` |
+| Tests | Concrete input + expected output | "test error case" | `input: { orderId: 'nonexistent' }, expect: BusinessException(ORDER_NOT_FOUND)` |
+| File paths | Full path from project root | "in the order module" | `src/order/use-cases/cancel-order.use-case.ts` |
+| Wiring | Exact array/property to modify | "register the service" | `Add CancelOrderUseCase to providers in src/order/order.module.ts` |
